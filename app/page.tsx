@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 
 type SearchMode = "prefix" | "anywhere";
-interface Song { Cantor: string; Musica: string; }
+interface Song { Cantor: string; Musica: string; DOHGA: string; }
 interface SongsResult { songs: Song[]; total: number; page: number; per_page: number; total_pages: number; }
 
 const FAV_KEY = "sqlyrics_favorites";
@@ -67,7 +67,7 @@ export default function Home() {
     setFavorites(prev =>
       isFav(song)
         ? prev.filter(f => !(f.Cantor === song.Cantor && f.Musica === song.Musica))
-        : [...prev, { Cantor: song.Cantor, Musica: song.Musica }]
+        : [...prev, { Cantor: song.Cantor, Musica: song.Musica, DOHGA: song.DOHGA }]
     );
   };
 
@@ -248,8 +248,9 @@ export default function Home() {
               {favorites.map((fav, i) => (
                 <li key={i} className="flex items-center justify-between gap-3 px-5 py-3.5 group hover:bg-white/[0.03] transition">
                   <div className="min-w-0">
+                    <span className="inline-block font-mono text-xs font-bold tracking-widest text-violet-300 bg-violet-500/10 border border-violet-500/20 rounded px-1.5 py-0.5 mb-1">{fav.DOHGA}</span>
                     <p className="text-sm font-medium text-slate-200 truncate">{fav.Cantor || "—"}</p>
-                    <p className="text-xs text-slate-400 truncate mt-0.5">{fav.Musica}</p>
+                    <p className="text-xs text-slate-400 truncate">{fav.Musica}</p>
                   </div>
                   <button
                     onClick={() => setFavorites(prev => prev.filter((_, j) => j !== i))}
@@ -271,8 +272,8 @@ export default function Home() {
     <button
       onClick={() => setShowFavorites(true)}
       className={`fixed bottom-6 right-6 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full shadow-2xl shadow-black/40 border transition-all duration-300 ${favorites.length > 0
-          ? "bg-red-500 border-red-400 text-white hover:bg-red-400"
-          : "bg-white/10 border-white/20 text-slate-400 hover:bg-white/15"
+        ? "bg-red-500 border-red-400 text-white hover:bg-red-400"
+        : "bg-white/10 border-white/20 text-slate-400 hover:bg-white/15"
         }`}
     >
       <HeartIcon filled={favorites.length > 0} />
@@ -441,8 +442,11 @@ export default function Home() {
             <div key={`card-${i}`} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
               <span className="text-xs text-slate-600 tabular-nums w-6 shrink-0 text-right">{(page - 1) * perPage + i + 1}</span>
               <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2 mb-0.5">
+                  <span className="inline-block font-mono text-xs font-bold tracking-widest text-violet-300 bg-violet-500/10 border border-violet-500/20 rounded px-1.5 py-0.5 shrink-0">{song.DOHGA}</span>
+                </div>
                 <p className="text-sm font-medium text-slate-200 truncate">{song.Cantor || <span className="italic text-slate-600">—</span>}</p>
-                <p className="text-xs text-slate-400 truncate mt-0.5">{song.Musica}</p>
+                <p className="text-xs text-slate-400 truncate">{song.Musica}</p>
               </div>
               {favBtn(song)}
             </div>
@@ -454,7 +458,7 @@ export default function Home() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/8 bg-white/[0.03]">
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500 w-12">#</th>
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Code</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Artist</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Song</th>
                 <th className="px-4 py-3 w-10" />
@@ -468,7 +472,9 @@ export default function Home() {
               )}
               {songs.map((song, i) => (
                 <tr key={`row-${i}`} className="group hover:bg-violet-500/5 transition-colors duration-150">
-                  <td className="px-4 py-3 text-slate-600 tabular-nums text-xs">{(page - 1) * perPage + i + 1}</td>
+                  <td className="px-4 py-3">
+                    <span className="font-mono text-sm font-bold tracking-widest text-violet-300 bg-violet-500/10 border border-violet-500/20 rounded-md px-2 py-1 whitespace-nowrap">{song.DOHGA}</span>
+                  </td>
                   <td className="px-4 py-3 font-medium text-slate-200 group-hover:text-violet-300 transition-colors">
                     {song.Cantor || <span className="italic text-slate-600">—</span>}
                   </td>

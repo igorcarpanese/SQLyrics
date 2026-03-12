@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
     const total_pages = Math.ceil(total / per_page);
 
     const songs = db
-        .prepare(`SELECT Cantor, Musica FROM karaoke ${where} ORDER BY Cantor, Musica LIMIT ? OFFSET ?`)
+        .prepare(`SELECT Cantor, Musica, DOHGA FROM karaoke ${where} ORDER BY Cantor, Musica LIMIT ? OFFSET ?`)
         .all(...params, per_page, offset);
 
     return NextResponse.json({ songs, total, page, per_page, total_pages });
