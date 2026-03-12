@@ -5,7 +5,7 @@ let db: Database.Database | null = null;
 
 export function getDb(): Database.Database {
     if (!db) {
-        const dbPath = path.resolve(process.cwd(), "../data/karaoke.db");
+        const dbPath = path.resolve(process.cwd(), "data/karaoke.db");
         db = new Database(dbPath, { readonly: true });
     }
     return db;
