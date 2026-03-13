@@ -8,6 +8,70 @@ export type Playlist = {
 
 export const PLAYLISTS: Playlist[] = [
   {
+    id: "disney",
+    name: "Disney Songs",
+    description: "Magical soundtracks and classic singalongs from your favorite movies.",
+    coverColor: "from-blue-500 to-cyan-400",
+    artists: [
+      "Disney",
+      "Phil Collins",
+      "Elton John",
+      "Idina Menzel",
+      "Auli'i Cravalho",
+      "Kristen Bell",
+      "TOKYO Disney Resort"
+    ],
+  },
+  {
+    id: "naruto",
+    name: "Naruto Openings",
+    description: "Believe it! The most iconic anime openings and endings.",
+    coverColor: "from-orange-500 to-amber-600",
+    artists: [
+      "GODAI NATSUKO",
+      "NARUTO YASUMIWAKA",
+      "Ikimonogakari",
+      "ASIAN KUNG-FU GENERATION",
+      "KANA-BOON",
+      "FLOW",
+      "Sambomaster"
+    ],
+  },
+  {
+    id: "br-hits",
+    name: "Músicas Brasileiras",
+    description: "Do axé ao funk, os maiores sucessos do Brasil.",
+    coverColor: "from-green-500 to-yellow-500",
+    artists: [
+      "Anitta",
+      "Ludmilla",
+      "Ivete Sangalo",
+      "Pabllo Vittar",
+      "Gloria Groove",
+      "Sandy",
+      "Ed Motta",
+      "Daniela Mercury"
+    ],
+  },
+  {
+    id: "k-pop",
+    name: "K-Pop",
+    description: "Get ready to dance to the biggest global k-pop hits.",
+    coverColor: "from-fuchsia-400 to-purple-600",
+    artists: [
+      "BTS",
+      "Blackpink",
+      "BlackPink",
+      "BLACKPINK (kpop)",
+      "Twice",
+      "2NE1 (kpop)",
+      "(G)I-DLE (kpop)",
+      "Red Velvet",
+      "EXO",
+      "Seventeen"
+    ],
+  },
+  {
     id: "pop-divas",
     name: "Pop Divas",
     description: "The queens of pop, perfect for belting it out.",
