@@ -279,10 +279,10 @@ export default function Home() {
       />
       {(["prefix", "anywhere"] as SearchMode[]).map(m => (
         <button key={m} onClick={() => setMode(m)}
-          className={`relative z-10 flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-medium transition-colors duration-300 ${mode === m ? "text-white" : "text-slate-400 hover:text-slate-300"}`}
+          title={`Search ${m}`}
+          className={`relative z-10 flex items-center justify-center w-10 h-6 sm:w-11 sm:h-7 rounded-full text-xs sm:text-sm font-medium transition-colors duration-300 cursor-pointer ${mode === m ? "text-white" : "text-slate-400 hover:text-slate-300"}`}
         >
           <span className="font-mono">{m === "prefix" ? "ab·" : "·ab·"}</span>
-          <span className="hidden sm:inline capitalize">{m}</span>
         </button>
       ))}
     </div>
@@ -412,9 +412,12 @@ export default function Home() {
     <div className="min-h-screen bg-[#0a0a14] flex flex-col items-center justify-center px-6 animate-fade-in">
       <div className="w-full max-w-xl">
         {/* Logo */}
-        <div className="text-center mb-10">
-          <div className="text-6xl mb-4">🎤</div>
-          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-violet-400 via-pink-400 to-violet-400 bg-clip-text text-transparent mb-3">
+        <div 
+          className="text-center mb-10 cursor-pointer group"
+          onClick={() => { setArtistQuery(""); setSongQuery(""); setHasSearched(false); }}
+        >
+          <div className="text-6xl mb-4 group-hover:scale-105 transition-transform">🎤</div>
+          <h1 className="text-4xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-violet-400 via-pink-400 to-violet-400 bg-clip-text text-transparent mb-3 group-hover:brightness-110 transition-all">
             SQLyrics
           </h1>
           <p className="text-slate-500 text-base">Find your next karaoke song</p>
@@ -472,7 +475,22 @@ export default function Home() {
 
           {/* Search Button (Mobile UI focus) */}
           <button type="submit" className="w-full py-4 mt-2 sm:mt-4 rounded-2xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-lg shadow-lg shadow-violet-600/30 transition-all active:scale-[0.98]">
-            Search Karaoke
+            Search
+          </button>
+          
+          {/* Browse All Songs Button */}
+          <button 
+            type="button" 
+            onClick={() => {
+              setArtistQuery("");
+              setSongQuery("");
+              setHasSearched(true);
+              setPage(1);
+              fetchSongs("", "", 1, mode);
+            }}
+            className="w-full py-3.5 mt-1 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 font-medium text-base transition-all active:scale-[0.98]"
+          >
+            Browse all songs
           </button>
         </form>
 
@@ -493,9 +511,9 @@ export default function Home() {
         <div className="mx-auto max-w-5xl px-3 sm:px-4 py-3">
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Logo */}
-            <button onClick={() => { setArtistQuery(""); setSongQuery(""); setHasSearched(false); }} className="flex items-center gap-2 shrink-0 group">
-              <span className="text-xl">🎤</span>
-              <span className="text-sm font-bold bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent hidden sm:block group-hover:opacity-80 transition">
+            <button onClick={() => { setArtistQuery(""); setSongQuery(""); setHasSearched(false); }} className="flex items-center gap-2 shrink-0 group cursor-pointer">
+              <span className="text-xl group-hover:scale-110 transition-transform">🎤</span>
+              <span className="text-sm font-bold bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent hidden sm:block group-hover:brightness-110 transition-all">
                 SQLyrics
               </span>
             </button>
@@ -570,7 +588,6 @@ export default function Home() {
           )}
           {songs.map((song, i) => (
             <div key={`card-${i}`} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-              <span className="text-xs text-slate-600 tabular-nums w-5 shrink-0 text-right">{(page - 1) * perPage + i + 1}</span>
               <div className="min-w-0 flex-1 flex flex-col justify-center">
                 <p className="text-sm font-medium text-slate-200 truncate">{song.Cantor || <span className="italic text-slate-600">—</span>}</p>
                 <p className="text-xs text-slate-400 truncate mt-0.5">{song.Musica}</p>
