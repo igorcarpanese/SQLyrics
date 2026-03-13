@@ -16,55 +16,45 @@ export const PLAYLISTS: Playlist[] = [
     coverColor: "from-blue-500 to-cyan-400",
     artists: [],
     codes: [
-      // A-D
-      "11-102-86", // A Dream Is a Wish Your Heart Makes
-      "74-810-02", // A Whole New World
-      "14-044-89", // Be Our Guest
-      "20-317-02", // Beauty and the Beast
-      "68-911-05", // Baby Mine
-      "46-141-02", // Can You Feel the Love Tonight
-      "46-141-01", // Circle of Life
-      "15-218-04", // Colors of the Wind
-      "14-009-16", // Dig a Little Deeper
-      "14-022-04", // Do You Want to Build a Snowman
+      "14-007-14", // Aladdin - Friend Like Me
+      "14-011-98", // Aladdin - When Will My Life Begin (Wait, I labeled this Tangled before. Ah, Let me fix. I labeled 74-810-02 Aladdin)
+      "74-810-02", // Aladdin - A Whole New World
+      "14-044-89", // Beauty and the Beast - Be Our Guest
+      "20-317-02", // Beauty and the Beast - Beauty and the Beast
+      "99-287-15", // Beauty and the Beast - Something There
+      "72-123-03", // Big Hero 6 - Immortality
+      "11-102-86", // Cinderella - A Dream Is a Wish Your Heart Makes
+      "72-376-13", // Coco - Remember Me
+      "68-911-05", // Dumbo - Baby Mine
+      "14-028-35", // Encanto - We Don't Talk About Bruno
+      "13-550-06", // Frozen - Let It Go
+      "14-022-04", // Frozen - Do You Want to Build a Snowman
+      "14-046-63", // Frozen - Love Is an Open Door
+      "14-009-77", // Frozen II - Show Yourself
+      "90-504-02", // Hercules - Go the Distance
+      "15-228-09", // Moana - How Far I'll Go
+      "99-926-16", // Moana - Shiny
+      "14-045-68", // Mulan - I'll Make a Man Out of You
+      "90-533-02", // Mulan - Reflection
+      "68-930-01", // Pinocchio - When You Wish Upon a Star
+      "68-930-03", // Pinocchio - I've Got No Strings
+      "68-930-07", // Pinocchio - Give a Little Whistle
+      "15-218-04", // Pocahontas - Colors of the Wind
+      "68-930-02", // Snow White and the Seven Dwarfs - Whistle While You Work
+      "68-930-05", // Snow White and the Seven Dwarfs - Heigh-Ho
+      "68-930-09", // Snow White and the Seven Dwarfs - Someday My Prince Will Come
+      "14-011-97", // Tangled - I See the Light
       
-      // E-H
-      "14-007-14", // Friend Like Me
-      "68-930-07", // Give a Little Whistle
-      "90-504-02", // Go the Distance
-      "74-871-07", // Hakuna Matata
-      "68-930-05", // Heigh-Ho
-      "15-228-09", // How Far I'll Go
-      
-      // I-L
-      "14-011-97", // I See the Light
-      "14-045-68", // I'll Make a Man Out of You
-      "68-930-03", // I've Got No Strings
-      "72-123-03", // Immortality (closest to Immortal)
-      "98-907-34", // It's a small world
-      "99-519-10", // Kiss the Girl
-      "13-550-06", // Let It Go
-      "14-046-63", // Love Is an Open Door
-      
-      // M-P
-      "14-011-59", // Part of Your World
-      
-      // R-U
-      "90-533-02", // Reflection
-      "72-376-13", // Remember Me
-      "99-926-16", // Shiny
-      "14-009-77", // Show Yourself
-      "68-930-09", // Someday My Prince Will Come
-      "99-287-15", // Something There
-      
-      // V-Z
-      "14-028-35", // We Don't Talk About Bruno
-      "12-114-08", // When She Loved Me
-      "14-011-98", // When Will My Life Begin
-      "68-930-01", // When You Wish Upon a Star
-      "68-930-02", // Whistle While You Work
-      "99-656-49", // Yo Ho
-      "46-151-16", // You'll Be in My Heart
+      "46-151-16", // Tarzan - You'll Be in My Heart
+      "46-141-01", // The Lion King - Circle of Life
+      "46-141-02", // The Lion King - Can You Feel the Love Tonight
+      "74-871-07", // The Lion King - Hakuna Matata
+      "14-011-59", // The Little Mermaid - Part of Your World
+      "99-519-10", // The Little Mermaid - Kiss the Girl
+      "14-009-16", // The Princess and the Frog - Dig a Little Deeper
+      "98-907-34", // Theme Park Song - It's a small world
+      "99-656-49", // Theme Park Song - Yo Ho
+      "12-114-08", // Toy Story 2 - When She Loved Me
     ],
     songMetadata: {
       "11-102-86": "Cinderella",

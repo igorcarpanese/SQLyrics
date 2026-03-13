@@ -518,7 +518,7 @@ function InnerHome() {
           {/* Playlists Button */}
           <Link 
             href="/playlists"
-            className="w-full py-3.5 mt-1 flex items-center justify-center gap-2 rounded-2xl bg-white/5 border border-white/10 hover:bg-violet-600/20 hover:border-violet-500/30 text-violet-300 font-medium text-base transition-all active:scale-[0.98]"
+            className="w-full py-3.5 mt-1 flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 font-medium text-base transition-all active:scale-[0.98]"
           >
             Recommended Playlists
           </Link>
