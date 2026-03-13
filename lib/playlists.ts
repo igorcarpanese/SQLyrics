@@ -4,6 +4,8 @@ export type Playlist = {
   description: string;
   coverColor: string;
   artists: string[];
+  codes?: string[];
+  songMetadata?: Record<string, string>;
 };
 
 export const PLAYLISTS: Playlist[] = [
@@ -12,30 +14,87 @@ export const PLAYLISTS: Playlist[] = [
     name: "Disney Songs",
     description: "Magical soundtracks and classic singalongs from your favorite movies.",
     coverColor: "from-blue-500 to-cyan-400",
-    artists: [
-      "Disney",
-      "Phil Collins",
-      "Elton John",
-      "Idina Menzel",
-      "Auli'i Cravalho",
-      "Kristen Bell",
-      "TOKYO Disney Resort"
-    ],
+    artists: [],
+    codes: [
+      "14-017-26", // Salem Ilese - Mad At Disney
+      "99-979-81", // Mrs. Green Apple - Disney Resort
+      "97-154-43", // Miriam Peracchi - A Bela E A Fera
+      "97-169-67", // Rogério Flausino - Lembre De Mim
+      "96-053-83", // Ed Motta - Tarzan
+      "97-155-45", // Ed Motta - Tarzan
+      "97-019-27", // Rosana - Oração (Disney)
+      "97-019-29", // Daniela Mercury - Se Eu Não Te Encontrasse
+    ]
   },
   {
     id: "naruto",
     name: "Naruto Openings",
     description: "Believe it! The most iconic anime openings and endings.",
     coverColor: "from-orange-500 to-amber-600",
-    artists: [
-      "GODAI NATSUKO",
-      "NARUTO YASUMIWAKA",
-      "Ikimonogakari",
-      "ASIAN KUNG-FU GENERATION",
-      "KANA-BOON",
-      "FLOW",
-      "Sambomaster"
+    artists: [],
+    codes: [
+      // Original
+      "99-005-09", // OP 1: ROCKS
+      "99-878-96", // OP 2: Haruka Kanata (or 98-919-98)
+      "99-861-23", // OP 3: Kanashimi (or 98-954-18)
+      "99-879-52", // OP 4: GO!!! (or 98-855-58)
+      "99-940-25", // OP 5: Seishun 
+      "99-974-21", // OP 6: No Boy No Cry
+      "98-958-49", // OP 7: Namikaze Satellite
+      "99-879-53", // OP 8: Re:member
+      "99-891-70", // OP 9: Yura Yura
+      
+      // Shippuden
+      "99-892-66", // Shippuden OP 1: Hero's come back
+      "99-868-46", // Shippuden OP 2: Distance
+      "99-872-73", // Shippuden OP 3: Blue Bird 
+      "99-877-25", // Shippuden OP 4: Closer
+      "99-891-86", // Shippuden OP 5: Hotaru no Hikari
+      "99-521-92", // Shippuden OP 6: Sign
+      "99-887-28", // Shippuden OP 7: Tohmei Datta Sekai
+      "99-892-62", // Shippuden OP 8: Diver
+      "99-892-78", // Shippuden OP 9: Lovers
+      "99-533-36", // Shippuden OP 10: Newsong
+      "98-891-70", // Shippuden OP 12: Moshimo (closest we had)
     ],
+    songMetadata: {
+      "99-005-09": "Opening 1 (Episodes 1-25)",
+      "99-878-96": "Opening 2 (Episodes 26-53)",
+      "98-919-98": "Opening 2 (Episodes 26-53)", // Alt version
+      "99-861-23": "Opening 3 (Episodes 54-77)",
+      "98-954-18": "Opening 3 (Episodes 54-77)", // Alt version
+      "99-879-52": "Opening 4 (Episodes 78-103)",
+      "98-855-58": "Opening 4 (Episodes 78-103)", // Alt version
+      "99-940-25": "Opening 5 (Episodes 104-128)",
+      "99-974-21": "Opening 6 (Episodes 129-153)",
+      "98-958-49": "Opening 7 (Episodes 154-178)",
+      "99-879-53": "Opening 8 (Episodes 179-202)",
+      "98-940-63": "Opening 8 (Episodes 179-202)", // Alt version
+      "99-891-70": "Opening 9 (Episodes 203-220)",
+      "98-968-66": "Opening 9 (Episodes 203-220)", // Alt version
+      
+      "99-892-66": "Shippuden OP 1",
+      "98-971-57": "Shippuden OP 1", // Alt version
+      "99-868-46": "Shippuden OP 2",
+      "98-922-23": "Shippuden OP 2", // Alt version
+      "99-872-73": "Shippuden OP 3",
+      "98-928-31": "Shippuden OP 3", // Alt version
+      "99-877-25": "Shippuden OP 4",
+      "98-931-98": "Shippuden OP 4", // Alt version
+      "99-891-86": "Shippuden OP 5",
+      "98-936-50": "Shippuden OP 5", // Alt version
+      "99-521-92": "Shippuden OP 6",
+      "98-936-05": "Shippuden OP 6", // Alt version
+      "99-887-28": "Shippuden OP 7",
+      "98-941-04": "Shippuden OP 7", // Alt version
+      "99-892-62": "Shippuden OP 8",
+      "98-948-19": "Shippuden OP 8", // Alt version
+      "99-892-78": "Shippuden OP 9",
+      "98-902-77": "Shippuden OP 9", // Alt version
+      "99-533-36": "Shippuden OP 10",
+      "98-908-09": "Shippuden OP 10", // Alt version
+      "98-891-70": "Shippuden OP 12 (Moshimo)", 
+    }
   },
   {
     id: "br-hits",

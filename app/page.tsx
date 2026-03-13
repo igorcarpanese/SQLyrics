@@ -643,6 +643,11 @@ function InnerHome() {
               <div className="min-w-0 flex-1 flex flex-col justify-center">
                 <p className="text-sm font-medium text-slate-200 truncate">{song.Cantor || <span className="italic text-slate-600">—</span>}</p>
                 <p className="text-xs text-slate-400 truncate mt-0.5">{song.Musica}</p>
+                {activePlaylist?.songMetadata?.[song.DOHGA] && (
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-violet-400 mt-1">
+                    {activePlaylist.songMetadata[song.DOHGA]}
+                  </p>
+                )}
               </div>
               <div className="flex flex-col items-end gap-2 shrink-0">
                 <span className="inline-block font-mono text-xs font-bold tracking-widest text-violet-300 bg-violet-500/10 border border-violet-500/20 rounded px-1.5 py-0.5">{song.DOHGA}</span>
@@ -659,13 +664,14 @@ function InnerHome() {
               <tr className="border-b border-white/8 bg-white/[0.03]">
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Artist</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Song</th>
+                {activePlaylist?.songMetadata && <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Category</th>}
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Code</th>
                 <th className="px-4 py-3 w-10 text-center">Fav</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.04]">
               {!loading && songs.length === 0 && (
-                <tr><td colSpan={4} className="px-4 py-16 text-center text-slate-500">
+                <tr><td colSpan={activePlaylist?.songMetadata ? 5 : 4} className="px-4 py-16 text-center text-slate-500">
                   <div className="flex flex-col items-center gap-2"><span className="text-4xl">🔍</span><span>No songs found</span></div>
                 </td></tr>
               )}
@@ -675,6 +681,13 @@ function InnerHome() {
                     {song.Cantor || <span className="italic text-slate-600">—</span>}
                   </td>
                   <td className="px-4 py-3 text-slate-300">{song.Musica}</td>
+                  {activePlaylist?.songMetadata && (
+                    <td className="px-4 py-3">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-violet-400 bg-violet-400/10 px-2 py-1 rounded inline-block whitespace-nowrap">
+                        {activePlaylist.songMetadata[song.DOHGA] || "—"}
+                      </span>
+                    </td>
+                  )}
                   <td className="px-4 py-3">
                     <span className="font-mono text-sm font-bold tracking-widest text-violet-300 bg-violet-500/10 border border-violet-500/20 rounded-md px-2 py-1 whitespace-nowrap">{song.DOHGA}</span>
                   </td>
