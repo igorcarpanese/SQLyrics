@@ -30,10 +30,14 @@ export default function PlaylistsPage() {
                 <div className="absolute inset-0 bg-black/20" />
                 {/* Decorative icon based on ID */}
                 <div className="relative z-10 text-5xl sm:text-6xl drop-shadow-lg opacity-90 transform group-hover:scale-110 group-hover:-rotate-3 transition-transform duration-500">
-                  {playlist.id.includes("pop") ? "✨" : 
-                   playlist.id.includes("rock") ? "🎸" :
-                   playlist.id.includes("sertanejo") ? "🤠" :
-                   playlist.id.includes("pagode") ? "🥁" : "💿"}
+                  {playlist.id === "pop-divas" ? "✨" : 
+                   playlist.id === "rock-classics" ? "🎸" :
+                   playlist.id === "brasil-sertanejo" ? "🤠" :
+                   playlist.id === "br-pagode" ? "🥁" : 
+                   playlist.id === "disney" ? "🏰" :
+                   playlist.id === "naruto" ? "🍥" :
+                   playlist.id === "br-hits" ? "🇧🇷" :
+                   playlist.id === "k-pop" ? "🫰" : "💿"}
                 </div>
               </div>
               

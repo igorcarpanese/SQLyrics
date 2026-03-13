@@ -19,12 +19,31 @@ export async function GET(request: NextRequest) {
 
     const conditions: string[] = [];
     const params: (string | number)[] = [];
+    
+    let orderByClause = "ORDER BY Cantor, Musica";
 
     if (playlistId) {
         const playlist = getPlaylist(playlistId);
-        if (playlist && playlist.artists.length > 0) {
-            conditions.push(`Cantor IN (${playlist.artists.map(() => "?").join(",")})`);
-            params.push(...playlist.artists);
+        if (playlist) {
+            const playlistConditions: string[] = [];
+            if (playlist.artists && playlist.artists.length > 0) {
+                playlistConditions.push(`Cantor IN (${playlist.artists.map(() => "?").join(",")})`);
+                params.push(...playlist.artists);
+            }
+            if (playlist.codes && playlist.codes.length > 0) {
+                playlistConditions.push(`DOHGA IN (${playlist.codes.map(() => "?").join(",")})`);
+                params.push(...playlist.codes);
+                
+                // If there are specific codes, order by the exact sequence they were defined in.
+                const caseStatements = playlist.codes.map((c, i) => `WHEN '${c}' THEN ${i + 1}`).join(" ");
+                orderByClause = `ORDER BY CASE DOHGA ${caseStatements} ELSE 9999 END, Cantor, Musica`;
+            }
+            
+            if (playlistConditions.length > 0) {
+                conditions.push(`(${playlistConditions.join(" OR ")})`);
+            } else {
+                conditions.push("1=0");
+            }
         } else {
             // If invalid playlist, return empty results
             conditions.push("1=0");
@@ -50,7 +69,7 @@ export async function GET(request: NextRequest) {
     const total_pages = Math.ceil(total / per_page);
 
     const songs = db
-        .prepare(`SELECT Cantor, Musica, DOHGA FROM karaoke ${where} ORDER BY Cantor, Musica LIMIT ? OFFSET ?`)
+        .prepare(`SELECT Cantor, Musica, DOHGA FROM karaoke ${where} ${orderByClause} LIMIT ? OFFSET ?`)
         .all(...params, per_page, offset);
 
     return NextResponse.json({ songs, total, page, per_page, total_pages });

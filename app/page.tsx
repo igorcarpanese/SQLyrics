@@ -592,8 +592,8 @@ function InnerHome() {
 
             {/* Header Actions */}
             <div className="flex items-center gap-2">
-              <Link href="/playlists" title="Playlists" className="p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-violet-600/20 text-slate-300 hover:text-violet-300 transition-colors flex shrink-0">
-                <span className="text-lg">🎧</span>
+              <Link href="/playlists" title="Playlists" className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/5 border border-white/10 hover:bg-violet-600/20 text-slate-300 hover:text-violet-300 transition-colors shrink-0">
+                <span className="text-base sm:text-lg">🎧</span>
               </Link>
               {modeToggle}
             </div>
