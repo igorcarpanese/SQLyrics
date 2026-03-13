@@ -1,6 +1,9 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import React, { useState, useEffect, useCallback, useRef, Suspense } from "react";
+import Link from "next/link";
+import { getPlaylist } from "@/lib/playlists";
+import { useSearchParams, useRouter } from "next/navigation";
 
 type SearchMode = "prefix" | "anywhere";
 interface Song { Cantor: string; Musica: string; DOHGA: string; }
@@ -15,7 +18,12 @@ const HeartIcon = ({ filled }: { filled: boolean }) => (
   </svg>
 );
 
-export default function Home() {
+function InnerHome() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const playlistParam = searchParams?.get("playlist") ?? "";
+  const activePlaylist = playlistParam ? getPlaylist(playlistParam) : undefined;
+
   // ── Search state ────────────────────────────────────────────────
   const [artistQuery, setArtistQuery] = useState("");
   const [songQuery, setSongQuery] = useState("");
@@ -54,7 +62,7 @@ export default function Home() {
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const acDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [hasSearched, setHasSearched] = useState(false);
+  const [hasSearched, setHasSearched] = useState(!!playlistParam);
 
   const handleSearchSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -97,10 +105,13 @@ export default function Home() {
 
   // ── Main search ─────────────────────────────────────────────────
   const fetchSongs = useCallback(
-    (artist: string, song: string, pg: number, m: SearchMode) => {
+    (artist: string, song: string, pg: number, m: SearchMode, pList?: string) => {
       setLoading(true);
-      const params = new URLSearchParams({ artist, song, mode: m, page: String(pg), per_page: String(perPage) });
-      fetch(`/api/songs?${params}`)
+      const urlParams = new URLSearchParams({ artist, song, mode: m, page: String(pg), per_page: String(perPage) });
+      if (pList || playlistParam) {
+        urlParams.set("playlist", pList || playlistParam);
+      }
+      fetch(`/api/songs?${urlParams.toString()}`)
         .then(r => r.json())
         .then((data: SongsResult) => {
           setSongs(data.songs);
@@ -108,7 +119,7 @@ export default function Home() {
           setTotalPages(data.total_pages);
           setLoading(false);
         });
-    }, []
+    }, [playlistParam]
   );
 
   useEffect(() => {
@@ -122,6 +133,16 @@ export default function Home() {
     if (hasSearched) fetchSongs(artistQuery, songQuery, page, mode);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
+
+  useEffect(() => {
+    // If a playlist param exists on mount, fetch it immediately
+    if (playlistParam) {
+      setArtistQuery("");
+      setSongQuery("");
+      setHasSearched(true);
+      fetchSongs("", "", 1, mode, playlistParam);
+    }
+  }, [playlistParam]);
 
   const artistAcDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const songAcDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -414,7 +435,7 @@ export default function Home() {
         {/* Logo */}
         <div 
           className="text-center mb-10 cursor-pointer group"
-          onClick={() => { setArtistQuery(""); setSongQuery(""); setHasSearched(false); }}
+          onClick={() => { setArtistQuery(""); setSongQuery(""); setHasSearched(false); router.replace("/"); }}
         >
           <div className="text-6xl mb-4 group-hover:scale-105 transition-transform">🎤</div>
           <h1 className="text-4xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-violet-400 via-pink-400 to-violet-400 bg-clip-text text-transparent mb-3 group-hover:brightness-110 transition-all">
@@ -486,12 +507,21 @@ export default function Home() {
               setSongQuery("");
               setHasSearched(true);
               setPage(1);
+              router.replace("/");
               fetchSongs("", "", 1, mode);
             }}
             className="w-full py-3.5 mt-1 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 font-medium text-base transition-all active:scale-[0.98]"
           >
             Browse all songs
           </button>
+
+          {/* Playlists Button */}
+          <Link 
+            href="/playlists"
+            className="w-full py-3.5 mt-1 flex items-center justify-center gap-2 rounded-2xl bg-white/5 border border-white/10 hover:bg-violet-600/20 hover:border-violet-500/30 text-violet-300 font-medium text-base transition-all active:scale-[0.98]"
+          >
+            Recommended Playlists
+          </Link>
         </form>
 
         <p className="text-center text-slate-600 text-xs mt-6">117,000+ songs in the catalogue</p>
@@ -511,7 +541,7 @@ export default function Home() {
         <div className="mx-auto max-w-5xl px-3 sm:px-4 py-3">
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Logo */}
-            <button onClick={() => { setArtistQuery(""); setSongQuery(""); setHasSearched(false); }} className="flex items-center gap-2 shrink-0 group cursor-pointer">
+            <button onClick={() => { setArtistQuery(""); setSongQuery(""); setHasSearched(false); router.replace("/"); }} className="flex items-center gap-2 shrink-0 group cursor-pointer">
               <span className="text-xl group-hover:scale-110 transition-transform">🎤</span>
               <span className="text-sm font-bold bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent hidden sm:block group-hover:brightness-110 transition-all">
                 SQLyrics
@@ -543,7 +573,7 @@ export default function Home() {
             <form onSubmit={handleSearchSubmit} className="relative flex-1 flex">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none z-10">
                 <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm12 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0z" />
                 </svg>
               </div>
               <input
@@ -560,11 +590,33 @@ export default function Home() {
               {showSongSuggestions && songSuggestionDropdown}
             </form>
 
-            {/* Mode toggle */}
-            {modeToggle}
+            {/* Header Actions */}
+            <div className="flex items-center gap-2">
+              <Link href="/playlists" title="Playlists" className="p-2 rounded-xl bg-white/5 border border-white/10 hover:bg-violet-600/20 text-slate-300 hover:text-violet-300 transition-colors flex shrink-0">
+                <span className="text-lg">🎧</span>
+              </Link>
+              {modeToggle}
+            </div>
           </div>
         </div>
       </header>
+
+      {/* Playlist Banner */}
+      {activePlaylist && (
+        <div className={`w-full bg-gradient-to-r ${activePlaylist.coverColor} px-4 py-6 sm:py-8 relative overflow-hidden`}>
+          <div className="absolute inset-0 bg-black/40" />
+          <div className="mx-auto max-w-5xl relative z-10 flex flex-col items-center sm:items-start text-center sm:text-left">
+            <h2 className="text-2xl sm:text-3xl font-bold text-white mb-2">{activePlaylist.name}</h2>
+            <p className="text-white/80 max-w-2xl">{activePlaylist.description}</p>
+            <button 
+              onClick={() => { router.replace("/"); setHasSearched(false); }}
+              className="mt-4 text-sm font-medium text-white/90 bg-white/20 hover:bg-white/30 px-4 py-1.5 rounded-full transition"
+            >
+              Clear Filter
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Results */}
       <main className="mx-auto max-w-5xl px-3 sm:px-4 py-4 sm:py-6 animate-fade-in-up">
@@ -671,5 +723,13 @@ export default function Home() {
       {favFab}
       {favoritesPanel}
     </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-[#0a0a14]" />}>
+      <InnerHome />
+    </Suspense>
   );
 }
