@@ -123,35 +123,50 @@ export default function Home() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
+  const artistAcDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const songAcDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // ── Autocomplete ────────────────────────────────────────────────
   useEffect(() => {
-    if (acDebounceRef.current) clearTimeout(acDebounceRef.current);
+    if (artistAcDebounceRef.current) clearTimeout(artistAcDebounceRef.current);
     if (!artistQuery.trim()) { setSuggestions([]); setShowSuggestions(false); return; }
-    acDebounceRef.current = setTimeout(() => {
+    artistAcDebounceRef.current = setTimeout(() => {
       fetch(`/api/artists?q=${encodeURIComponent(artistQuery)}&mode=${mode}`)
         .then(r => r.json())
         .then((data: { artists: string[] }) => {
           setSuggestions(data.artists);
-          setShowSuggestions(data.artists.length > 0);
+          // Only show dropdown if one of the artist inputs is currently focused
+          if (
+            document.activeElement === heroArtistRef.current ||
+            document.activeElement === headerArtistRef.current
+          ) {
+            setShowSuggestions(data.artists.length > 0);
+          }
           setActiveSuggestion(-1);
         });
     }, 150);
-    return () => { if (acDebounceRef.current) clearTimeout(acDebounceRef.current); };
+    return () => { if (artistAcDebounceRef.current) clearTimeout(artistAcDebounceRef.current); };
   }, [artistQuery, mode]);
 
   useEffect(() => {
-    if (acDebounceRef.current) clearTimeout(acDebounceRef.current);
+    if (songAcDebounceRef.current) clearTimeout(songAcDebounceRef.current);
     if (!songQuery.trim()) { setSongSuggestions([]); setShowSongSuggestions(false); return; }
-    acDebounceRef.current = setTimeout(() => {
+    songAcDebounceRef.current = setTimeout(() => {
       fetch(`/api/songs_autocomplete?q=${encodeURIComponent(songQuery)}&mode=${mode}`)
         .then(r => r.json())
         .then((data: { songs: string[] }) => {
           setSongSuggestions(data.songs);
-          setShowSongSuggestions(data.songs.length > 0);
+          // Only show dropdown if one of the song inputs is currently focused
+          if (
+            document.activeElement === heroSongRef.current ||
+            document.activeElement === headerSongRef.current
+          ) {
+            setShowSongSuggestions(data.songs.length > 0);
+          }
           setActiveSongSuggestion(-1);
         });
     }, 150);
-    return () => { if (acDebounceRef.current) clearTimeout(acDebounceRef.current); };
+    return () => { if (songAcDebounceRef.current) clearTimeout(songAcDebounceRef.current); };
   }, [songQuery, mode]);
 
   useEffect(() => {
