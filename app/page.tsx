@@ -28,10 +28,14 @@ export default function Home() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  // ── Autocomplete state ──────────────────────────────────────────
+  // ── Autocomplete states ─────────────────────────────────────────
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(-1);
+
+  const [songSuggestions, setSongSuggestions] = useState<string[]>([]);
+  const [showSongSuggestions, setShowSongSuggestions] = useState(false);
+  const [activeSongSuggestion, setActiveSongSuggestion] = useState(-1);
 
   // ── Favorites state ─────────────────────────────────────────────
   const [favorites, setFavorites] = useState<Song[]>([]);
@@ -41,11 +45,31 @@ export default function Home() {
   const heroArtistRef = useRef<HTMLInputElement>(null);
   const headerArtistRef = useRef<HTMLInputElement>(null);
   const suggestionBoxRef = useRef<HTMLDivElement>(null);
+
+  const heroSongRef = useRef<HTMLInputElement>(null);
+  const headerSongRef = useRef<HTMLInputElement>(null);
+  const songSuggestionBoxRef = useRef<HTMLDivElement>(null);
+
   const perPage = 50;
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const acDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const hasSearched = artistQuery.trim() !== "" || songQuery.trim() !== "";
+  const [hasSearched, setHasSearched] = useState(false);
+
+  const handleSearchSubmit = (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (artistQuery.trim() || songQuery.trim()) {
+      // Blur the currently focused input so mobile keyboard dismisses
+      if (document.activeElement instanceof HTMLElement) {
+        document.activeElement.blur();
+      }
+      setShowSuggestions(false);
+      setShowSongSuggestions(false);
+      setHasSearched(true);
+      setPage(1);
+      if (!hasSearched) fetchSongs(artistQuery, songQuery, 1, mode);
+    }
+  };
 
   // ── Favorites persistence ───────────────────────────────────────
   useEffect(() => {
@@ -116,6 +140,21 @@ export default function Home() {
   }, [artistQuery, mode]);
 
   useEffect(() => {
+    if (acDebounceRef.current) clearTimeout(acDebounceRef.current);
+    if (!songQuery.trim()) { setSongSuggestions([]); setShowSongSuggestions(false); return; }
+    acDebounceRef.current = setTimeout(() => {
+      fetch(`/api/songs_autocomplete?q=${encodeURIComponent(songQuery)}&mode=${mode}`)
+        .then(r => r.json())
+        .then((data: { songs: string[] }) => {
+          setSongSuggestions(data.songs);
+          setShowSongSuggestions(data.songs.length > 0);
+          setActiveSongSuggestion(-1);
+        });
+    }, 150);
+    return () => { if (acDebounceRef.current) clearTimeout(acDebounceRef.current); };
+  }, [songQuery, mode]);
+
+  useEffect(() => {
     const handler = (e: MouseEvent) => {
       const target = e.target as Node;
       if (
@@ -123,6 +162,12 @@ export default function Home() {
         !headerArtistRef.current?.contains(target) &&
         !suggestionBoxRef.current?.contains(target)
       ) setShowSuggestions(false);
+
+      if (
+        !heroSongRef.current?.contains(target) &&
+        !headerSongRef.current?.contains(target) &&
+        !songSuggestionBoxRef.current?.contains(target)
+      ) setShowSongSuggestions(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -132,14 +177,52 @@ export default function Home() {
     setArtistQuery(name);
     setShowSuggestions(false);
     setSuggestions([]);
+    if (!hasSearched) {
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      setHasSearched(true);
+      setPage(1);
+      fetchSongs(name, songQuery, 1, mode);
+    } else {
+      handleSearchSubmit();
+    }
+  };
+
+  const selectSongSuggestion = (name: string) => {
+    setSongQuery(name);
+    setShowSongSuggestions(false);
+    setSongSuggestions([]);
+    if (!hasSearched) {
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      setHasSearched(true);
+      setPage(1);
+      fetchSongs(artistQuery, name, 1, mode);
+    } else {
+      handleSearchSubmit();
+    }
   };
 
   const handleArtistKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !showSuggestions) {
+      handleSearchSubmit();
+      return;
+    }
     if (!showSuggestions) return;
     if (e.key === "ArrowDown") { e.preventDefault(); setActiveSuggestion(p => Math.min(p + 1, suggestions.length - 1)); }
     else if (e.key === "ArrowUp") { e.preventDefault(); setActiveSuggestion(p => Math.max(p - 1, 0)); }
     else if (e.key === "Enter" && activeSuggestion >= 0) { e.preventDefault(); selectSuggestion(suggestions[activeSuggestion]); }
     else if (e.key === "Escape") setShowSuggestions(false);
+  };
+
+  const handleSongKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !showSongSuggestions) {
+      handleSearchSubmit();
+      return;
+    }
+    if (!showSongSuggestions) return;
+    if (e.key === "ArrowDown") { e.preventDefault(); setActiveSongSuggestion(p => Math.min(p + 1, songSuggestions.length - 1)); }
+    else if (e.key === "ArrowUp") { e.preventDefault(); setActiveSongSuggestion(p => Math.max(p - 1, 0)); }
+    else if (e.key === "Enter" && activeSongSuggestion >= 0) { e.preventDefault(); selectSongSuggestion(songSuggestions[activeSongSuggestion]); }
+    else if (e.key === "Escape") setShowSongSuggestions(false);
   };
 
   const highlight = (text: string, query: string) => {
@@ -202,6 +285,23 @@ export default function Home() {
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
           </svg>
           <span>{highlight(name, artistQuery)}</span>
+        </button>
+      ))}
+    </div>
+  );
+
+  const songSuggestionDropdown = (
+    <div ref={songSuggestionBoxRef} className="absolute top-full left-0 right-0 mt-1.5 rounded-xl border border-white/10 bg-[#13131f] shadow-2xl shadow-black/50 overflow-hidden z-50">
+      {songSuggestions.map((name, idx) => (
+        <button key={name}
+          onMouseDown={e => { e.preventDefault(); selectSongSuggestion(name); }}
+          onMouseEnter={() => setActiveSongSuggestion(idx)}
+          className={`w-full flex items-center gap-3 px-4 py-3 text-sm text-left transition-colors ${idx === activeSongSuggestion ? "bg-violet-600/20 text-slate-100" : "text-slate-300 hover:bg-white/5"}`}
+        >
+          <svg className="w-3.5 h-3.5 shrink-0 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm12 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0z" />
+          </svg>
+          <span>{highlight(name, songQuery)}</span>
         </button>
       ))}
     </div>
@@ -311,11 +411,11 @@ export default function Home() {
         </div>
 
         {/* Search inputs */}
-        <div className="flex flex-col gap-3">
+        <form onSubmit={handleSearchSubmit} className="flex flex-col gap-3 sm:gap-4 w-full">
           {/* Artist */}
           <div className="relative">
             <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none z-10">
-              <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z" />
               </svg>
             </div>
@@ -329,27 +429,37 @@ export default function Home() {
               placeholder="Artist name…"
               autoComplete="off"
               autoFocus
-              className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/5 border border-white/10 text-slate-200 placeholder-slate-500 text-base focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition"
+              className="w-full pl-12 pr-4 py-4 sm:py-5 rounded-2xl bg-white/5 border border-white/10 text-slate-200 placeholder-slate-500 text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition shadow-inner"
             />
             {showSuggestions && suggestionDropdown}
           </div>
 
           {/* Song */}
           <div className="relative">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none">
-              <svg className="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none z-10">
+              <svg className="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm12 0a2 2 0 1 1-4 0 2 2 0 0 1 4 0z" />
               </svg>
             </div>
             <input
+              ref={heroSongRef}
               type="text"
               value={songQuery}
               onChange={e => setSongQuery(e.target.value)}
+              onFocus={() => songSuggestions.length > 0 && setShowSongSuggestions(true)}
+              onKeyDown={handleSongKeyDown}
               placeholder="Song title…"
-              className="w-full pl-12 pr-4 py-4 rounded-2xl bg-white/5 border border-white/10 text-slate-200 placeholder-slate-500 text-base focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition"
+              autoComplete="off"
+              className="w-full pl-12 pr-4 py-4 sm:py-5 rounded-2xl bg-white/5 border border-white/10 text-slate-200 placeholder-slate-500 text-base sm:text-lg focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition shadow-inner"
             />
+            {showSongSuggestions && songSuggestionDropdown}
           </div>
-        </div>
+
+          {/* Search Button (Mobile UI focus) */}
+          <button type="submit" className="w-full py-4 mt-2 sm:mt-4 rounded-2xl bg-violet-600 hover:bg-violet-500 text-white font-bold text-lg shadow-lg shadow-violet-600/30 transition-all active:scale-[0.98]">
+            Search Karaoke
+          </button>
+        </form>
 
         <p className="text-center text-slate-600 text-xs mt-6">117,000+ songs in the catalogue</p>
       </div>
@@ -368,7 +478,7 @@ export default function Home() {
         <div className="mx-auto max-w-5xl px-3 sm:px-4 py-3">
           <div className="flex items-center gap-2 sm:gap-3">
             {/* Logo */}
-            <button onClick={() => { setArtistQuery(""); setSongQuery(""); }} className="flex items-center gap-2 shrink-0 group">
+            <button onClick={() => { setArtistQuery(""); setSongQuery(""); setHasSearched(false); }} className="flex items-center gap-2 shrink-0 group">
               <span className="text-xl">🎤</span>
               <span className="text-sm font-bold bg-gradient-to-r from-violet-400 to-pink-400 bg-clip-text text-transparent hidden sm:block group-hover:opacity-80 transition">
                 SQLyrics
@@ -376,7 +486,7 @@ export default function Home() {
             </button>
 
             {/* Artist input */}
-            <div className="relative flex-1">
+            <form onSubmit={handleSearchSubmit} className="relative flex-1 flex">
               <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none z-10">
                 <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 1 1-8 0 4 4 0 0 1 8 0zM12 14a7 7 0 0 0-7 7h14a7 7 0 0 0-7-7z" />
@@ -394,23 +504,28 @@ export default function Home() {
                 className="w-full pl-9 pr-3 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-200 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition"
               />
               {showSuggestions && suggestionDropdown}
-            </div>
+            </form>
 
             {/* Song input */}
-            <div className="relative flex-1">
-              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+            <form onSubmit={handleSearchSubmit} className="relative flex-1 flex">
+              <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none z-10">
                 <svg className="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19V6l12-3v13M9 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0z" />
                 </svg>
               </div>
               <input
+                ref={headerSongRef}
                 type="text"
                 value={songQuery}
                 onChange={e => setSongQuery(e.target.value)}
+                onFocus={() => songSuggestions.length > 0 && setShowSongSuggestions(true)}
+                onKeyDown={handleSongKeyDown}
                 placeholder="Song…"
+                autoComplete="off"
                 className="w-full pl-9 pr-3 py-2 rounded-xl bg-white/5 border border-white/10 text-slate-200 placeholder-slate-500 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500/50 focus:border-violet-500/50 transition"
               />
-            </div>
+              {showSongSuggestions && songSuggestionDropdown}
+            </form>
 
             {/* Mode toggle */}
             {modeToggle}
@@ -440,15 +555,15 @@ export default function Home() {
           )}
           {songs.map((song, i) => (
             <div key={`card-${i}`} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
-              <span className="text-xs text-slate-600 tabular-nums w-6 shrink-0 text-right">{(page - 1) * perPage + i + 1}</span>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 mb-0.5">
-                  <span className="inline-block font-mono text-xs font-bold tracking-widest text-violet-300 bg-violet-500/10 border border-violet-500/20 rounded px-1.5 py-0.5 shrink-0">{song.DOHGA}</span>
-                </div>
+              <span className="text-xs text-slate-600 tabular-nums w-5 shrink-0 text-right">{(page - 1) * perPage + i + 1}</span>
+              <div className="min-w-0 flex-1 flex flex-col justify-center">
                 <p className="text-sm font-medium text-slate-200 truncate">{song.Cantor || <span className="italic text-slate-600">—</span>}</p>
-                <p className="text-xs text-slate-400 truncate">{song.Musica}</p>
+                <p className="text-xs text-slate-400 truncate mt-0.5">{song.Musica}</p>
               </div>
-              {favBtn(song)}
+              <div className="flex flex-col items-end gap-2 shrink-0">
+                <span className="inline-block font-mono text-xs font-bold tracking-widest text-violet-300 bg-violet-500/10 border border-violet-500/20 rounded px-1.5 py-0.5">{song.DOHGA}</span>
+                {favBtn(song)}
+              </div>
             </div>
           ))}
         </div>
@@ -458,10 +573,10 @@ export default function Home() {
           <table className="w-full text-sm">
             <thead>
               <tr className="border-b border-white/8 bg-white/[0.03]">
-                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Code</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Artist</th>
                 <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Song</th>
-                <th className="px-4 py-3 w-10" />
+                <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400">Code</th>
+                <th className="px-4 py-3 w-10 text-center">Fav</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-white/[0.04]">
@@ -472,14 +587,14 @@ export default function Home() {
               )}
               {songs.map((song, i) => (
                 <tr key={`row-${i}`} className="group hover:bg-violet-500/5 transition-colors duration-150">
-                  <td className="px-4 py-3">
-                    <span className="font-mono text-sm font-bold tracking-widest text-violet-300 bg-violet-500/10 border border-violet-500/20 rounded-md px-2 py-1 whitespace-nowrap">{song.DOHGA}</span>
-                  </td>
                   <td className="px-4 py-3 font-medium text-slate-200 group-hover:text-violet-300 transition-colors">
                     {song.Cantor || <span className="italic text-slate-600">—</span>}
                   </td>
                   <td className="px-4 py-3 text-slate-300">{song.Musica}</td>
-                  <td className="px-4 py-3">{favBtn(song)}</td>
+                  <td className="px-4 py-3">
+                    <span className="font-mono text-sm font-bold tracking-widest text-violet-300 bg-violet-500/10 border border-violet-500/20 rounded-md px-2 py-1 whitespace-nowrap">{song.DOHGA}</span>
+                  </td>
+                  <td className="px-4 py-3 text-center">{favBtn(song)}</td>
                 </tr>
               ))}
             </tbody>
