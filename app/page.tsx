@@ -107,6 +107,19 @@ function InnerHome() {
     );
   };
 
+  // Filter all songs by this artist
+  const filterByArtist = (artist: string, e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!artist) return;
+    setArtistQuery(artist);
+    setSongQuery("");
+    setPage(1);
+    setHasSearched(true);
+    setShowFavorites(false);
+    router.replace("/");
+    fetchSongs(artist, "", 1, mode);
+  };
+
   // ── Main search ─────────────────────────────────────────────────
   const fetchSongs = useCallback(
     (artist: string, song: string, pg: number, m: SearchMode, pList?: string) => {
@@ -393,7 +406,13 @@ function InnerHome() {
                 >
                   <div className="min-w-0">
                     <span className="inline-block font-mono text-xs font-bold tracking-widest text-violet-300 bg-violet-500/10 border border-violet-500/20 rounded px-1.5 py-0.5 mb-1">{fav.DOHGA}</span>
-                    <p className="text-sm font-medium text-slate-200 truncate">{fav.Cantor || "—"}</p>
+                    {fav.Cantor
+                      ? <button
+                          onClick={e => filterByArtist(fav.Cantor, e)}
+                          className="block text-sm font-medium text-slate-200 hover:text-violet-300 hover:underline underline-offset-2 text-left transition-colors"
+                        >{fav.Cantor}</button>
+                      : <p className="text-sm font-medium italic text-slate-600">—</p>
+                    }
                     <p className="text-xs text-slate-400 truncate">{fav.Musica}</p>
                   </div>
                   <button
@@ -659,7 +678,13 @@ function InnerHome() {
               className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.05] cursor-pointer transition-colors"
             >
               <div className="min-w-0 flex-1 flex flex-col justify-center">
-                <p className="text-sm font-medium text-slate-200 truncate">{song.Cantor || <span className="italic text-slate-600">—</span>}</p>
+                {song.Cantor
+                  ? <button
+                      onClick={e => filterByArtist(song.Cantor, e)}
+                      className="text-sm font-medium text-slate-200 hover:text-violet-300 hover:underline underline-offset-2 text-left truncate transition-colors"
+                    >{song.Cantor}</button>
+                  : <p className="text-sm font-medium italic text-slate-600">—</p>
+                }
                 <p className="text-xs text-slate-400 truncate mt-0.5">{song.Musica}</p>
                 {activePlaylist?.songMetadata?.[song.DOHGA] && (
                   <p className="text-[10px] font-bold uppercase tracking-wider text-violet-400 mt-1">
@@ -699,8 +724,14 @@ function InnerHome() {
                   onClick={() => setSelectedSongForLyrics(song)}
                   className="group hover:bg-violet-500/5 cursor-pointer transition-colors duration-150"
                 >
-                  <td className="px-4 py-3 font-medium text-slate-200 group-hover:text-violet-300 transition-colors">
-                    {song.Cantor || <span className="italic text-slate-600">—</span>}
+                  <td className="px-4 py-3 font-medium text-slate-200">
+                    {song.Cantor
+                      ? <button
+                          onClick={e => filterByArtist(song.Cantor, e)}
+                          className="hover:text-violet-300 hover:underline underline-offset-2 text-left transition-colors"
+                        >{song.Cantor}</button>
+                      : <span className="italic text-slate-600">—</span>
+                    }
                   </td>
                   <td className="px-4 py-3 text-slate-300">{song.Musica}</td>
                   {activePlaylist?.songMetadata && (
