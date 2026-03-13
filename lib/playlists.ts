@@ -58,20 +58,20 @@ export const PLAYLISTS: Playlist[] = [
       "98-891-70", // Shippuden OP 12: Moshimo (closest we had)
     ],
     songMetadata: {
-      "99-005-09": "Opening 1 (Episodes 1-25)",
-      "99-878-96": "Opening 2 (Episodes 26-53)",
-      "98-919-98": "Opening 2 (Episodes 26-53)", // Alt version
-      "99-861-23": "Opening 3 (Episodes 54-77)",
-      "98-954-18": "Opening 3 (Episodes 54-77)", // Alt version
-      "99-879-52": "Opening 4 (Episodes 78-103)",
-      "98-855-58": "Opening 4 (Episodes 78-103)", // Alt version
-      "99-940-25": "Opening 5 (Episodes 104-128)",
-      "99-974-21": "Opening 6 (Episodes 129-153)",
-      "98-958-49": "Opening 7 (Episodes 154-178)",
-      "99-879-53": "Opening 8 (Episodes 179-202)",
-      "98-940-63": "Opening 8 (Episodes 179-202)", // Alt version
-      "99-891-70": "Opening 9 (Episodes 203-220)",
-      "98-968-66": "Opening 9 (Episodes 203-220)", // Alt version
+      "99-005-09": "Opening 1",
+      "99-878-96": "Opening 2",
+      "98-919-98": "Opening 2", // Alt version
+      "99-861-23": "Opening 3",
+      "98-954-18": "Opening 3", // Alt version
+      "99-879-52": "Opening 4",
+      "98-855-58": "Opening 4", // Alt version
+      "99-940-25": "Opening 5",
+      "99-974-21": "Opening 6",
+      "98-958-49": "Opening 7",
+      "99-879-53": "Opening 8",
+      "98-940-63": "Opening 8", // Alt version
+      "99-891-70": "Opening 9",
+      "98-968-66": "Opening 9", // Alt version
       
       "99-892-66": "Shippuden OP 1",
       "98-971-57": "Shippuden OP 1", // Alt version
@@ -93,7 +93,7 @@ export const PLAYLISTS: Playlist[] = [
       "98-902-77": "Shippuden OP 9", // Alt version
       "99-533-36": "Shippuden OP 10",
       "98-908-09": "Shippuden OP 10", // Alt version
-      "98-891-70": "Shippuden OP 12 (Moshimo)", 
+      "98-891-70": "Shippuden OP 12", 
     }
   },
   {
