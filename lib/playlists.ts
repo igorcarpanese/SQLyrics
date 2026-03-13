@@ -16,15 +16,101 @@ export const PLAYLISTS: Playlist[] = [
     coverColor: "from-blue-500 to-cyan-400",
     artists: [],
     codes: [
-      "14-017-26", // Salem Ilese - Mad At Disney
-      "99-979-81", // Mrs. Green Apple - Disney Resort
-      "97-154-43", // Miriam Peracchi - A Bela E A Fera
-      "97-169-67", // Rogério Flausino - Lembre De Mim
-      "96-053-83", // Ed Motta - Tarzan
-      "97-155-45", // Ed Motta - Tarzan
-      "97-019-27", // Rosana - Oração (Disney)
-      "97-019-29", // Daniela Mercury - Se Eu Não Te Encontrasse
-    ]
+      // A-D
+      "11-102-86", // A Dream Is a Wish Your Heart Makes
+      "74-810-02", // A Whole New World
+      "14-044-89", // Be Our Guest
+      "20-317-02", // Beauty and the Beast
+      "68-911-05", // Baby Mine
+      "46-141-02", // Can You Feel the Love Tonight
+      "46-141-01", // Circle of Life
+      "15-218-04", // Colors of the Wind
+      "14-009-16", // Dig a Little Deeper
+      "14-022-04", // Do You Want to Build a Snowman
+      
+      // E-H
+      "14-007-14", // Friend Like Me
+      "68-930-07", // Give a Little Whistle
+      "90-504-02", // Go the Distance
+      "74-871-07", // Hakuna Matata
+      "68-930-05", // Heigh-Ho
+      "15-228-09", // How Far I'll Go
+      
+      // I-L
+      "14-011-97", // I See the Light
+      "14-045-68", // I'll Make a Man Out of You
+      "68-930-03", // I've Got No Strings
+      "72-123-03", // Immortality (closest to Immortal)
+      "98-907-34", // It's a small world
+      "99-519-10", // Kiss the Girl
+      "13-550-06", // Let It Go
+      "14-046-63", // Love Is an Open Door
+      
+      // M-P
+      "14-011-59", // Part of Your World
+      
+      // R-U
+      "90-533-02", // Reflection
+      "72-376-13", // Remember Me
+      "99-926-16", // Shiny
+      "14-009-77", // Show Yourself
+      "68-930-09", // Someday My Prince Will Come
+      "99-287-15", // Something There
+      
+      // V-Z
+      "14-028-35", // We Don't Talk About Bruno
+      "12-114-08", // When She Loved Me
+      "14-011-98", // When Will My Life Begin
+      "68-930-01", // When You Wish Upon a Star
+      "68-930-02", // Whistle While You Work
+      "99-656-49", // Yo Ho
+      "46-151-16", // You'll Be in My Heart
+    ],
+    songMetadata: {
+      "11-102-86": "Cinderella",
+      "74-810-02": "Aladdin",
+      "14-044-89": "Beauty and the Beast",
+      "20-317-02": "Beauty and the Beast",
+      "68-911-05": "Dumbo",
+      "46-141-02": "The Lion King",
+      "46-141-01": "The Lion King",
+      "15-218-04": "Pocahontas",
+      "14-009-16": "The Princess and the Frog",
+      "14-022-04": "Frozen",
+      
+      "14-007-14": "Aladdin",
+      "68-930-07": "Pinocchio",
+      "90-504-02": "Hercules",
+      "74-871-07": "The Lion King",
+      "68-930-05": "Snow White and the Seven Dwarfs",
+      "15-228-09": "Moana",
+      
+      "14-011-97": "Tangled",
+      "14-045-68": "Mulan",
+      "68-930-03": "Pinocchio",
+      "72-123-03": "Big Hero 6",
+      "98-907-34": "Theme Park Song",
+      "99-519-10": "The Little Mermaid",
+      "13-550-06": "Frozen",
+      "14-046-63": "Frozen",
+      
+      "14-011-59": "The Little Mermaid",
+      
+      "90-533-02": "Mulan",
+      "72-376-13": "Coco",
+      "99-926-16": "Moana",
+      "14-009-77": "Frozen II",
+      "68-930-09": "Snow White and the Seven Dwarfs",
+      "99-287-15": "Beauty and the Beast",
+      
+      "14-028-35": "Encanto",
+      "12-114-08": "Toy Story 2",
+      "14-011-98": "Tangled",
+      "68-930-01": "Pinocchio",
+      "68-930-02": "Snow White and the Seven Dwarfs",
+      "99-656-49": "Theme Park Song",
+      "46-151-16": "Tarzan",
+    }
   },
   {
     id: "naruto",
