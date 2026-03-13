@@ -5,6 +5,7 @@ import Link from "next/link";
 import { getPlaylist } from "@/lib/playlists";
 import { useSearchParams, useRouter } from "next/navigation";
 import LyricsModal from "@/components/LyricsModal";
+import { useTheme } from "next-themes";
 
 type SearchMode = "prefix" | "anywhere";
 interface Song { Cantor: string; Musica: string; DOHGA: string; }
@@ -326,6 +327,21 @@ function InnerHome() {
     </div>
   );
 
+  // ── Theme toggle ───────────────────────────────────────────────
+  const { theme, setTheme } = useTheme();
+  const themeToggle = (
+    <button
+      onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+      title={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+      className="flex items-center justify-center w-9 h-8 sm:w-10 sm:h-9 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-slate-400 hover:text-yellow-300 transition-all shrink-0"
+    >
+      {theme === "dark"
+        ? <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z" /></svg>
+        : <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+      }
+    </button>
+  );
+
   const suggestionDropdown = (
     <div ref={suggestionBoxRef} className="absolute top-full left-0 right-0 mt-1.5 rounded-xl border border-white/10 bg-[#13131f] shadow-2xl shadow-black/50 overflow-hidden z-50">
       {suggestions.map((name, idx) => (
@@ -477,8 +493,9 @@ function InnerHome() {
         </div>
 
         {/* Mode toggle */}
-        <div className="flex justify-center mb-6">
+        <div className="flex items-center justify-center gap-2 mb-6">
           {modeToggle}
+          {themeToggle}
         </div>
 
         {/* Search inputs */}
@@ -628,6 +645,7 @@ function InnerHome() {
               <Link href="/playlists" title="Playlists" className="flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-white/5 border border-white/10 hover:bg-violet-600/20 text-slate-300 hover:text-violet-300 transition-colors shrink-0">
                 <span className="text-base sm:text-lg">🎧</span>
               </Link>
+              {themeToggle}
               {modeToggle}
             </div>
           </div>

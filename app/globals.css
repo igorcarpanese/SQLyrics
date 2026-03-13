@@ -18,11 +18,78 @@ body {
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
 
+/* ── Light Theme Overrides ─────────────────────────────────────── */
+
+/* Base page background and default text */
+.light body {
+  background: #f8f7ff;
+  color: #1e1b4b;
+}
+
+/* Main page backgrounds */
+.light .bg-\[\#0a0a14\]   { background-color: #f0eeff !important; }
+.light .bg-\[\#13131f\]   { background-color: #e8e4ff !important; }
+.light .bg-\[\#1a1a2e\]   { background-color: #ede8ff !important; }
+
+/* Glass surfaces: replace white/opacity patterns */
+.light .bg-white\/\[0\.02\]  { background-color: rgba(139,92,246,0.04) !important; }
+.light .bg-white\/\[0\.03\]  { background-color: rgba(139,92,246,0.06) !important; }
+.light .bg-white\/\[0\.04\]  { background-color: rgba(139,92,246,0.08) !important; }
+.light .bg-white\/\[0\.05\]  { background-color: rgba(139,92,246,0.1)  !important; }
+.light .bg-white\/5          { background-color: rgba(139,92,246,0.08) !important; }
+.light .bg-white\/10         { background-color: rgba(139,92,246,0.12) !important; }
+.light .hover\:bg-white\/10:hover { background-color: rgba(139,92,246,0.15) !important; }
+.light .hover\:bg-white\/15:hover { background-color: rgba(139,92,246,0.18) !important; }
+
+/* Borders: white/opacity → violet/opacity */
+.light .border-white\/5   { border-color: rgba(139,92,246,0.15) !important; }
+.light .border-white\/8   { border-color: rgba(139,92,246,0.2)  !important; }
+.light .border-white\/10  { border-color: rgba(139,92,246,0.25) !important; }
+.light .border-white\/\[0\.06\] { border-color: rgba(139,92,246,0.2) !important; }
+.light .border-white\/\[0\.08\] { border-color: rgba(139,92,246,0.2) !important; }
+
+/* Text color overrides */
+.light .text-slate-200   { color: #1e1b4b !important; }
+.light .text-slate-100   { color: #1e1b4b !important; }
+.light .text-slate-300   { color: #312e81 !important; }
+.light .text-slate-400   { color: #4338ca !important; }
+.light .text-slate-500   { color: #7c3aed !important; }
+.light .text-slate-600   { color: #a78bfa !important; }
+.light .placeholder-slate-500::placeholder { color: #a78bfa; }
+
+/* Sticky header / backdrop */
+.light .bg-\[\#0a0a14\]\/90 { background-color: rgba(240,238,255,0.92) !important; }
+
+/* Inputs */
+.light input {
+  background-color: rgba(237,232,255,0.8) !important;
+  color: #1e1b4b !important;
+  border-color: rgba(139,92,246,0.35) !important;
+}
+.light input::placeholder { color: #a78bfa !important; }
+
+/* Table hover row */
+.light .hover\:bg-violet-500\/5:hover { background-color: rgba(139,92,246,0.07) !important; }
+
+/* Scrollbar */
+.light ::-webkit-scrollbar-track { background: #ede8ff; }
+.light ::-webkit-scrollbar-thumb { background: #a78bfa; }
+
+/* Select dropdowns */
+.light select option {
+  background: #ede8ff;
+  color: #1e1b4b;
+}
+
+/* Favorites drawer */
+.light .bg-\[\#13131f\] { background-color: #ede8ff !important; }
+.light .divide-white\/\[0\.05\] > * + * { border-color: rgba(139,92,246,0.15) !important; }
+
 * {
   scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar (dark default) */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
