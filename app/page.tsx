@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef, Suspense } from "react
 import Link from "next/link";
 import { getPlaylist } from "@/lib/playlists";
 import { useSearchParams, useRouter } from "next/navigation";
+import LyricsModal from "@/components/LyricsModal";
 
 type SearchMode = "prefix" | "anywhere";
 interface Song { Cantor: string; Musica: string; DOHGA: string; }
@@ -48,6 +49,9 @@ function InnerHome() {
   // ── Favorites state ─────────────────────────────────────────────
   const [favorites, setFavorites] = useState<Song[]>([]);
   const [showFavorites, setShowFavorites] = useState(false);
+
+  // ── Lyrics state ────────────────────────────────────────────────
+  const [selectedSongForLyrics, setSelectedSongForLyrics] = useState<Song | null>(null);
 
   // ── Refs ────────────────────────────────────────────────────────
   const heroArtistRef = useRef<HTMLInputElement>(null);
@@ -382,7 +386,11 @@ function InnerHome() {
           ) : (
             <ul className="divide-y divide-white/[0.05]">
               {favorites.map((fav, i) => (
-                <li key={i} className="flex items-center justify-between gap-3 px-5 py-3.5 group hover:bg-white/[0.03] transition">
+                <li 
+                  key={i} 
+                  onClick={() => setSelectedSongForLyrics(fav)}
+                  className="flex items-center justify-between gap-3 px-5 py-3.5 group hover:bg-white/[0.04] cursor-pointer transition"
+                >
                   <div className="min-w-0">
                     <span className="inline-block font-mono text-xs font-bold tracking-widest text-violet-300 bg-violet-500/10 border border-violet-500/20 rounded px-1.5 py-0.5 mb-1">{fav.DOHGA}</span>
                     <p className="text-sm font-medium text-slate-200 truncate">{fav.Cantor || "—"}</p>
@@ -426,6 +434,11 @@ function InnerHome() {
     >
       <HeartIcon filled={isFav(song)} />
     </button>
+  );
+
+  // ── Lyrics Layer ────────────────────────────────────────────────
+  const lyricsLayer = selectedSongForLyrics && (
+    <LyricsModal song={selectedSongForLyrics} onClose={() => setSelectedSongForLyrics(null)} />
   );
 
   // ── HERO VIEW (no search yet) ───────────────────────────────────
@@ -529,6 +542,7 @@ function InnerHome() {
 
       {favFab}
       {favoritesPanel}
+      {lyricsLayer}
     </div>
   );
 
@@ -639,7 +653,11 @@ function InnerHome() {
             </div>
           )}
           {songs.map((song, i) => (
-            <div key={`card-${i}`} className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06]">
+            <div 
+              key={`card-${i}`} 
+              onClick={() => setSelectedSongForLyrics(song)}
+              className="flex items-center gap-3 px-4 py-3 rounded-xl bg-white/[0.03] border border-white/[0.06] hover:bg-white/[0.05] cursor-pointer transition-colors"
+            >
               <div className="min-w-0 flex-1 flex flex-col justify-center">
                 <p className="text-sm font-medium text-slate-200 truncate">{song.Cantor || <span className="italic text-slate-600">—</span>}</p>
                 <p className="text-xs text-slate-400 truncate mt-0.5">{song.Musica}</p>
@@ -676,7 +694,11 @@ function InnerHome() {
                 </td></tr>
               )}
               {songs.map((song, i) => (
-                <tr key={`row-${i}`} className="group hover:bg-violet-500/5 transition-colors duration-150">
+                <tr 
+                  key={`row-${i}`} 
+                  onClick={() => setSelectedSongForLyrics(song)}
+                  className="group hover:bg-violet-500/5 cursor-pointer transition-colors duration-150"
+                >
                   <td className="px-4 py-3 font-medium text-slate-200 group-hover:text-violet-300 transition-colors">
                     {song.Cantor || <span className="italic text-slate-600">—</span>}
                   </td>
@@ -735,6 +757,7 @@ function InnerHome() {
 
       {favFab}
       {favoritesPanel}
+      {lyricsLayer}
     </div>
   );
 }
