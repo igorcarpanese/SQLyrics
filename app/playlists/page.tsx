@@ -22,7 +22,7 @@ export default function PlaylistsPage() {
           {PLAYLISTS.map(playlist => (
             <Link 
               key={playlist.id} 
-              href={`/?playlist=${playlist.id}`}
+              href={playlist.id === "br-hits" ? `/playlists/br-hits` : `/?playlist=${playlist.id}`}
               className="group block rounded-3xl overflow-hidden bg-white/5 border border-white/10 hover:border-white/20 transition-all hover:scale-[1.02] hover:shadow-2xl hover:shadow-violet-900/20"
             >
               {/* Cover Gradient */}

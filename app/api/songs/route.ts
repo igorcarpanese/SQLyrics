@@ -11,6 +11,7 @@ export async function GET(request: NextRequest) {
     const song = searchParams.get("song")?.trim() ?? "";
     const playlistId = searchParams.get("playlist")?.trim() ?? "";
     const mode = searchParams.get("mode") === "prefix" ? "prefix" : "anywhere";
+    const pvOnly = searchParams.get("pv") === "true";
     const page = Math.max(1, parseInt(searchParams.get("page") ?? "1", 10));
     const per_page = Math.min(100, Math.max(1, parseInt(searchParams.get("per_page") ?? "50", 10)));
 
@@ -59,6 +60,10 @@ export async function GET(request: NextRequest) {
         }
     }
 
+    if (pvOnly) {
+        conditions.push("PV LIKE '%PV%'");
+    }
+
     const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
 
     const countRow = db
@@ -69,7 +74,7 @@ export async function GET(request: NextRequest) {
     const total_pages = Math.ceil(total / per_page);
 
     const songs = db
-        .prepare(`SELECT Cantor, Musica, DOHGA FROM karaoke ${where} ${orderByClause} LIMIT ? OFFSET ?`)
+        .prepare(`SELECT Cantor, Musica, DOHGA, PV FROM karaoke ${where} ${orderByClause} LIMIT ? OFFSET ?`)
         .all(...params, per_page, offset);
 
     return NextResponse.json({ songs, total, page, per_page, total_pages });

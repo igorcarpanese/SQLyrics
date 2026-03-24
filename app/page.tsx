@@ -8,7 +8,7 @@ import LyricsModal from "@/components/LyricsModal";
 import { useTheme } from "next-themes";
 
 type SearchMode = "prefix" | "anywhere";
-interface Song { Cantor: string; Musica: string; DOHGA: string; }
+interface Song { Cantor: string; Musica: string; DOHGA: string; PV: string; }
 interface SongsResult { songs: Song[]; total: number; page: number; per_page: number; total_pages: number; }
 
 const FAV_KEY = "sqlyrics_favorites";
@@ -24,12 +24,14 @@ function InnerHome() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const playlistParam = searchParams?.get("playlist") ?? "";
+  const artistParam = searchParams?.get("artist") ?? "";
   const activePlaylist = playlistParam ? getPlaylist(playlistParam) : undefined;
 
   // ── Search state ────────────────────────────────────────────────
-  const [artistQuery, setArtistQuery] = useState("");
+  const [artistQuery, setArtistQuery] = useState(artistParam);
   const [songQuery, setSongQuery] = useState("");
   const [mode, setMode] = useState<SearchMode>("prefix");
+  const [pvOnly, setPvOnly] = useState(false);
 
   // ── Results state ───────────────────────────────────────────────
   const [songs, setSongs] = useState<Song[]>([]);
@@ -67,7 +69,7 @@ function InnerHome() {
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const acDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const [hasSearched, setHasSearched] = useState(!!playlistParam);
+  const [hasSearched, setHasSearched] = useState(!!playlistParam || !!artistParam);
 
   const handleSearchSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -80,7 +82,7 @@ function InnerHome() {
       setShowSongSuggestions(false);
       setHasSearched(true);
       setPage(1);
-      if (!hasSearched) fetchSongs(artistQuery, songQuery, 1, mode);
+      if (!hasSearched) fetchSongs(artistQuery, songQuery, 1, mode, pvOnly);
     }
   };
 
@@ -104,7 +106,7 @@ function InnerHome() {
     setFavorites(prev =>
       isFav(song)
         ? prev.filter(f => !(f.Cantor === song.Cantor && f.Musica === song.Musica))
-        : [...prev, { Cantor: song.Cantor, Musica: song.Musica, DOHGA: song.DOHGA }]
+        : [...prev, { Cantor: song.Cantor, Musica: song.Musica, DOHGA: song.DOHGA, PV: song.PV }]
     );
   };
 
@@ -118,14 +120,14 @@ function InnerHome() {
     setHasSearched(true);
     setShowFavorites(false);
     router.replace("/");
-    fetchSongs(artist, "", 1, mode);
+    fetchSongs(artist, "", 1, mode, pvOnly);
   };
 
   // ── Main search ─────────────────────────────────────────────────
   const fetchSongs = useCallback(
-    (artist: string, song: string, pg: number, m: SearchMode, pList?: string) => {
+    (artist: string, song: string, pg: number, m: SearchMode, pv: boolean, pList?: string) => {
       setLoading(true);
-      const urlParams = new URLSearchParams({ artist, song, mode: m, page: String(pg), per_page: String(perPage) });
+      const urlParams = new URLSearchParams({ artist, song, mode: m, page: String(pg), per_page: String(perPage), pv: String(pv) });
       if (pList || playlistParam) {
         urlParams.set("playlist", pList || playlistParam);
       }
@@ -143,24 +145,29 @@ function InnerHome() {
   useEffect(() => {
     if (!hasSearched) return;
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
-    searchDebounceRef.current = setTimeout(() => { setPage(1); fetchSongs(artistQuery, songQuery, 1, mode); }, 300);
+    searchDebounceRef.current = setTimeout(() => { setPage(1); fetchSongs(artistQuery, songQuery, 1, mode, pvOnly); }, 300);
     return () => { if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current); };
-  }, [artistQuery, songQuery, mode, fetchSongs, hasSearched]);
+  }, [artistQuery, songQuery, mode, pvOnly, fetchSongs, hasSearched]);
 
   useEffect(() => {
-    if (hasSearched) fetchSongs(artistQuery, songQuery, page, mode);
+    if (hasSearched) fetchSongs(artistQuery, songQuery, page, mode, pvOnly);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [page]);
 
   useEffect(() => {
-    // If a playlist param exists on mount, fetch it immediately
+    // If a playlist or artist param exists on mount, fetch it immediately
     if (playlistParam) {
       setArtistQuery("");
       setSongQuery("");
       setHasSearched(true);
-      fetchSongs("", "", 1, mode, playlistParam);
+      fetchSongs("", "", 1, mode, false, playlistParam);
+    } else if (artistParam) {
+      setArtistQuery(artistParam);
+      setSongQuery("");
+      setHasSearched(true);
+      fetchSongs(artistParam, "", 1, mode, false);
     }
-  }, [playlistParam]);
+  }, [playlistParam, artistParam, fetchSongs, mode]);
 
   const artistAcDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const songAcDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -235,7 +242,7 @@ function InnerHome() {
       if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       setHasSearched(true);
       setPage(1);
-      fetchSongs(name, songQuery, 1, mode);
+      fetchSongs(name, songQuery, 1, mode, pvOnly);
     } else {
       handleSearchSubmit();
     }
@@ -249,7 +256,7 @@ function InnerHome() {
       if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
       setHasSearched(true);
       setPage(1);
-      fetchSongs(artistQuery, name, 1, mode);
+      fetchSongs(artistQuery, name, 1, mode, pvOnly);
     } else {
       handleSearchSubmit();
     }
@@ -332,18 +339,21 @@ function InnerHome() {
   const [themeMounted, setThemeMounted] = useState(false);
   useEffect(() => setThemeMounted(true), []);
   const isDark = resolvedTheme === "dark";
+
+  // To prevent hydration mismatch, we only render the full button once mounted
   const themeToggle = (
     <button
-      onClick={() => setTheme(isDark ? "light" : "dark")}
-      title={isDark ? "Switch to light mode" : "Switch to dark mode"}
+      onClick={() => themeMounted && setTheme(isDark ? "light" : "dark")}
+      title={!themeMounted ? "Loading theme..." : (isDark ? "Switch to light mode" : "Switch to dark mode")}
       className="flex items-center justify-center w-9 h-8 sm:w-10 sm:h-9 rounded-full bg-white/5 border border-white/10 hover:bg-white/10 text-slate-400 hover:text-yellow-300 transition-all shrink-0"
     >
-      {!themeMounted
-        ? <span className="w-4 h-4" />   // placeholder to avoid layout shift
-        : isDark
-          ? <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z" /></svg>
-          : <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
-      }
+      {!themeMounted ? (
+        <div className="w-4 h-4 border-2 border-slate-500/30 border-t-slate-400 rounded-full animate-spin" />
+      ) : isDark ? (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0z" /></svg>
+      ) : (
+        <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" /></svg>
+      )}
     </button>
   );
 
@@ -561,8 +571,9 @@ function InnerHome() {
               setSongQuery("");
               setHasSearched(true);
               setPage(1);
+              setPvOnly(false);
               router.replace("/");
-              fetchSongs("", "", 1, mode);
+              fetchSongs("", "", 1, mode, false);
             }}
             className="w-full py-3.5 mt-1 rounded-2xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 font-medium text-base transition-all active:scale-[0.98]"
           >
@@ -676,15 +687,31 @@ function InnerHome() {
 
       {/* Results */}
       <main className="mx-auto max-w-5xl px-3 sm:px-4 py-4 sm:py-6 animate-fade-in-up">
-        {/* Stats */}
-        <div className="mb-3 flex items-center justify-between text-xs sm:text-sm">
-          <span className="text-slate-400">
-            {loading
-              ? <span className="animate-pulse text-slate-500">Searching…</span>
-              : <><span className="text-slate-200 font-semibold">{total.toLocaleString()}</span> songs found</>
-            }
-          </span>
-          <span className="text-slate-500">Page {page} / {totalPages.toLocaleString()}</span>
+        {/* Stats & Controls */}
+        <div className="mb-4 sm:mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs sm:text-sm">
+          <div className="flex items-center gap-4 text-slate-400">
+            {loading ? (
+              <span className="animate-pulse text-slate-500">Searching…</span>
+            ) : (
+              <span><span className="text-slate-200 font-semibold">{total.toLocaleString()}</span> songs found</span>
+            )}
+            <span className="text-slate-500 hidden sm:inline-block">Page {page} / {totalPages.toLocaleString()}</span>
+          </div>
+          
+          <div className="flex items-center gap-2 self-end sm:self-auto bg-white/5 rounded-lg p-1 border border-white/10">
+             <button
+                onClick={() => setPvOnly(false)}
+                className={`px-3 py-1.5 rounded-md transition-colors ${!pvOnly ? "bg-violet-600/80 text-white font-medium shadow" : "text-slate-400 hover:text-slate-200"}`}
+             >
+               Todas
+             </button>
+             <button
+                onClick={() => setPvOnly(true)}
+                className={`px-3 py-1.5 rounded-md transition-colors ${pvOnly ? "bg-violet-600/80 text-white font-medium shadow" : "text-slate-400 hover:text-slate-200"}`}
+             >
+               🎬 Apenas Clipes (PV)
+             </button>
+          </div>
         </div>
 
         {/* Mobile cards */}
@@ -708,7 +735,14 @@ function InnerHome() {
                     >{song.Cantor}</button>
                   : <p className="text-sm font-medium italic text-slate-600">—</p>
                 }
-                <p className="text-xs text-slate-400 truncate mt-0.5">{song.Musica}</p>
+                <p className="text-xs text-slate-400 mt-0.5 flex flex-wrap items-center gap-2">
+                  <span className="truncate">{song.Musica}</span>
+                  {song.PV && song.PV.includes("PV") && (
+                    <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[9px] font-bold tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase shrink-0">
+                      🎬 CLIPE
+                    </span>
+                  )}
+                </p>
                 {activePlaylist?.songMetadata?.[song.DOHGA] && (
                   <p className="text-[10px] font-bold uppercase tracking-wider text-violet-400 mt-1">
                     {activePlaylist.songMetadata[song.DOHGA]}
@@ -742,8 +776,8 @@ function InnerHome() {
                 </td></tr>
               )}
               {songs.map((song, i) => (
-                <tr 
-                  key={`row-${i}`} 
+                <tr
+                  key={`row-${i}`}
                   onClick={() => setSelectedSongForLyrics(song)}
                   className="group hover:bg-violet-500/5 cursor-pointer transition-colors duration-150"
                 >
@@ -756,7 +790,14 @@ function InnerHome() {
                       : <span className="italic text-slate-600">—</span>
                     }
                   </td>
-                  <td className="px-4 py-3 text-slate-300">{song.Musica}</td>
+                  <td className="px-4 py-3 text-slate-300">
+                    {song.Musica}
+                    {song.PV && song.PV.includes("PV") && (
+                      <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold tracking-widest bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase">
+                        🎬 CLIPE
+                      </span>
+                    )}
+                  </td>
                   {activePlaylist?.songMetadata && (
                     <td className="px-4 py-3">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-violet-400 bg-violet-400/10 px-2 py-1 rounded inline-block whitespace-nowrap">

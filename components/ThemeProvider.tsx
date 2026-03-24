@@ -9,6 +9,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
       defaultTheme="dark"
       storageKey="sqlyrics_theme"
       enableSystem={false}
+      disableTransitionOnChange
     >
       {children}
     </NextThemesProvider>
